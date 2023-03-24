@@ -79,5 +79,5 @@ COPY --from=builder-thttpd /usr/local/bin/thttpd /usr/local/bin
 COPY --from=builder-traefik /usr/local/bin/traefik /usr/local/bin
 COPY --from=builder-envsubst /tmp/package/ /
 COPY --from=builder-s6 /tmp /
-EXPOSE 53/udp 80/tcp 443/tcp
+EXPOSE 53/udp 80/tcp 443/tcp 8080/tcp
 ENTRYPOINT ["/init"]

@@ -1,0 +1,27 @@
+providers:
+    file:
+        filename: /etc/traefik/dynamic.yaml
+
+api:
+    dashboard: true
+    insecure: true
+
+log:
+    format: common
+    level: DEBUG
+    noColor: true
+
+entryPoints:
+    web:
+        address: ":80"
+        forwardedHeaders:
+            insecure: true
+    websecure:
+        address: ":443"
+        forwardedHeaders:
+            insecure: true
+
+experimental:
+    localPlugins:
+        voyager-docker:
+            moduleName: github.com/MetaSyntactical/voyager-docker-provider
