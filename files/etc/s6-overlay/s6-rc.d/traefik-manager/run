@@ -1,0 +1,2 @@
+#!/command/with-contenv sh
+/usr/local/bin/voyager-traefik-manager --containerId=$HOSTNAME --traefikConfig=/etc/traefik/dynamic.yaml

@@ -3,6 +3,7 @@ ARG THTTPD_VERSION=2.29
 ARG TRAEFIK_VERSION=3.0.0-beta2
 ARG DNSMASQ_VERSION=2.87-r1
 ARG S6_OVERLAY_VERSION=3.1.4.1
+ARG TRAEFIKMANAGER_VERSION=1.0.0
 
 FROM alpine:$ALPINE_VERSION AS builder-thttpd
 ARG ALPINE_VERSION
@@ -35,6 +36,23 @@ RUN set -ex; \
     tar xzf /tmp/traefik.tar.gz -C /usr/local/bin traefik; \
     rm -f /tmp/traefik.tar.gz; \
     chmod +x /usr/local/bin/traefik
+
+
+FROM alpine:$ALPINE_VERSION AS builder-traefikmanager
+ARG ALPINE_VERSION
+ARG TRAEFIKMANAGER_VERSION
+RUN apk --no-cache add ca-certificates tzdata
+RUN set -ex; \
+    apkArch="$(apk --print-arch)"; \
+    case "$apkArch" in \
+        aarch64) arch='arm64' ;; \
+        x86_64) arch='x86_64' ;; \
+        *) echo >&2 "error: unsupported architecture: $apkArch"; exit 1 ;; \
+    esac; \
+    wget --quiet -O /tmp/voyager-traefik-manager.tar.gz "https://github.com/MetaSyntactical/voyager-traefik-manager/releases/download/${TRAEFIKMANAGER_VERSION}/voyager-traefik-manager_linux_$arch.tar.gz"; \
+    tar xzf /tmp/voyager-traefik-manager.tar.gz -C /usr/local/bin voyager-traefik-manager; \
+    rm -f /tmp/voyager-traefik-manager.tar.gz; \
+    chmod +x /usr/local/bin/voyager-traefik-manager
 
 
 FROM alpine:$ALPINE_VERSION AS builder-s6
@@ -77,6 +95,7 @@ RUN set -ex; \
     apk --no-cache add dnsmasq=${DNSMASQ_VERSION}
 COPY --from=builder-thttpd /usr/local/bin/thttpd /usr/local/bin
 COPY --from=builder-traefik /usr/local/bin/traefik /usr/local/bin
+COPY --from=builder-traefikmanager /usr/local/bin/voyager-traefik-manager /usr/local/bin
 COPY --from=builder-envsubst /tmp/package/ /
 COPY --from=builder-s6 /tmp /
 EXPOSE 53/udp 80/tcp 443/tcp 8080/tcp
