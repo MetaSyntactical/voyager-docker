@@ -1,7 +1,7 @@
 ARG ALPINE_VERSION=3.17
 ARG THTTPD_VERSION=2.29
 ARG TRAEFIK_VERSION=3.0.0-beta2
-ARG DNSMASQ_VERSION=2.87-r1
+ARG DNSMASQ_VERSION=2.87
 ARG S6_OVERLAY_VERSION=3.1.4.1
 ARG TRAEFIKMANAGER_VERSION=1.0.0
 
@@ -86,13 +86,15 @@ ARG DNSMASQ_VERSION
 ENV LANG='en_US.UTF-8' \
     LANGUAGE='en_US.UTF-8' \
     TERM='xterm'
-ENV BASE_DOMAIN='.docker'
+ENV BASE_DOMAIN='docker'
+LABEL com.metasyntactical.voyager.proxy.domain=docker
+LABEL com.metasyntactical.voyager.proxy.tls=true
 COPY files/ /
 RUN set -ex; \
     chmod +x /usr/local/bin/bootstrap-*.sh
 RUN set -ex; \
     apk --no-cache add ca-certificates tzdata; \
-    apk --no-cache add dnsmasq=${DNSMASQ_VERSION}
+    apk --no-cache add dnsmasq=~${DNSMASQ_VERSION}
 COPY --from=builder-thttpd /usr/local/bin/thttpd /usr/local/bin
 COPY --from=builder-traefik /usr/local/bin/traefik /usr/local/bin
 COPY --from=builder-traefikmanager /usr/local/bin/voyager-traefik-manager /usr/local/bin
