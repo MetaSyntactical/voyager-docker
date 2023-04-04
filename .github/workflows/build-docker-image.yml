@@ -26,6 +26,9 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
+          labels: |
+            com.metasyntactical.voyager.proxy.version=${{ github.ref_name }}
+          target: final
           tags: |
             ghcr.io/metasyntactical/voyager:latest
             ghcr.io/metasyntactical/voyager:${{ github.ref_name }}
