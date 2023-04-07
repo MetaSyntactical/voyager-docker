@@ -70,16 +70,6 @@ RUN set -ex; \
     rm /tmp/s6-overlay-*.tar.xz
 
 
-FROM alpine:$ALPINE_VERSION AS builder-envsubst
-ARG ALPINE_VERSION
-RUN set -ex; \
-    apk add --no-cache --update libintl gettext; \
-    mkdir -p /tmp/package/usr/local/bin; \
-    mkdir -p /tmp/package/usr/lib; \
-    cp /usr/bin/envsubst /tmp/package/usr/local/bin; \
-    cp /usr/lib/libintl.so.* /tmp/package/usr/lib
-
-
 FROM alpine:$ALPINE_VERSION AS final
 ARG ALPINE_VERSION
 ARG DNSMASQ_VERSION
@@ -95,10 +85,10 @@ RUN set -ex; \
 RUN set -ex; \
     apk --no-cache add ca-certificates tzdata; \
     apk --no-cache add dnsmasq=~${DNSMASQ_VERSION}
+COPY --from=hairyhenderson/gomplate:stable /gomplate /usr/local/bin/gomplate
 COPY --from=builder-thttpd /usr/local/bin/thttpd /usr/local/bin
 COPY --from=builder-traefik /usr/local/bin/traefik /usr/local/bin
 COPY --from=builder-traefikmanager /usr/local/bin/voyager-traefik-manager /usr/local/bin
-COPY --from=builder-envsubst /tmp/package/ /
 COPY --from=builder-s6 /tmp /
 EXPOSE 53/udp 80/tcp 443/tcp 8080/tcp
 ENTRYPOINT ["/init"]
