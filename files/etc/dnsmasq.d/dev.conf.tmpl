@@ -2,5 +2,6 @@ strict-order
 no-hosts
 no-resolv
 
-domain=$DNSMASQ_DEFAULT_DOMAIN
-address=/$DNSMASQ_DEFAULT_DOMAIN/127.0.0.1
+{{- range $index, $domain := env.Getenv "DNSMASQ_DOMAINS" | strings.Split "," }}
+address=/{{ $domain }}/127.0.0.1
+{{ end }}

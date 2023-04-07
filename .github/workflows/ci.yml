@@ -1,8 +1,8 @@
 name: docker-build
 
 on:
-  release:
-    types: [created]
+  push:
+  pull_request:
 
 jobs:
   docker:
@@ -25,12 +25,9 @@ jobs:
         with:
           context: .
           platforms: linux/amd64,linux/arm64
-          push: true
+          push: false
           provenance: false
           labels: |
             com.metasyntactical.voyager.proxy.version=${{ github.ref_name }}
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
           target: final
-          tags: |
-            ghcr.io/metasyntactical/voyager:latest
-            ghcr.io/metasyntactical/voyager:${{ github.ref_name }}
