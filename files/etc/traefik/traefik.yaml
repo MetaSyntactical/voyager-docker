@@ -9,7 +9,6 @@ api:
 log:
     format: common
     level: DEBUG
-    noColor: true
 
 entryPoints:
     web:
